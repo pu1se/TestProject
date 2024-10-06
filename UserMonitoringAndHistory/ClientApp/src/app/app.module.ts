@@ -26,10 +26,12 @@ import { AuthorizeInterceptor } from 'src/api-authorization/authorize.intercepto
     HttpClientModule,
     FormsModule,
     ApiAuthorizationModule,
-    RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
+    RouterModule.forRoot([      
+      { path: '', redirectTo: '/home', pathMatch: 'full' },
+      { path: 'home', component: HomeComponent, canActivate: [AuthorizeGuard] },
+      { path: 'counter', component: CounterComponent, canActivate: [AuthorizeGuard] },
       { path: 'fetch-data', component: FetchDataComponent, canActivate: [AuthorizeGuard] },
+      { path: '**', redirectTo: '' }
     ])
   ],
   providers: [

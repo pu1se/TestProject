@@ -12,10 +12,23 @@ namespace UserMonitoringAndHistory.Data
 {
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
+         private static bool MigrationWasChecked { get; set; } = false;
+
         public ApplicationDbContext(
             DbContextOptions options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
+            if (!MigrationWasChecked)
+            {
+                MigrationWasChecked = true;
+                try
+                {
+                    Database.Migrate();
+                }
+                catch(Exception ex)
+                {
+                }
+            }
         }
     }
 }

@@ -35,9 +35,6 @@ TestResults/
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
-# Entity Framework migrations
-Migrations/
-
 # NuGet
 *.nupkg
 # Packages directory can be ignored when using PackageReference
