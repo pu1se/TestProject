@@ -24,6 +24,7 @@ namespace UserMonitoringAndHistory.Data
                 try
                 {
                     Database.Migrate();
+                    //DatabaseInitializer.BaseSeeding(this);
                 }
                 catch(Exception ex)
                 {
