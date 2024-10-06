@@ -1,5 +1,6 @@
 ﻿using IdentityServer4.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -16,7 +17,8 @@ namespace UserMonitoringAndHistory.Data
 
         public ApplicationDbContext(
             DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+            IOptions<OperationalStoreOptions> operationalStoreOptions,
+            IServiceProvider serviceProvider) : base(options, operationalStoreOptions)
         {
             if (!MigrationWasChecked)
             {
@@ -24,7 +26,8 @@ namespace UserMonitoringAndHistory.Data
                 try
                 {
                     Database.Migrate();
-                    //DatabaseInitializer.BaseSeeding(this);
+                    var userManager = serviceProvider.GetService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
+                    DatabaseInitializer.BaseSeeding(this, userManager);
                 }
                 catch(Exception ex)
                 {

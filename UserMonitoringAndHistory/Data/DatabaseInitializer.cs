@@ -8,14 +8,17 @@ namespace UserMonitoringAndHistory.Data
     public static class TestData
     {
         public static readonly string AdminUserEmail = "admin@admin.com";
-        public static readonly string AdminUserName = "admin";
-        public static readonly string AdminUserPassword = "admin";
+        public static readonly string AdminUserName = "admin@admin.com";
+        public static readonly string AdminUserPassword = "admin@admin.com";
         public static readonly Guid AdminUserId = new Guid("1118aa58-c48e-4696-98cf-1b6e22c63076");
     }
 
     public static class DatabaseInitializer
     {
-        public static void BaseSeeding(ApplicationDbContext applicationDbContext)
+        public static void BaseSeeding(
+            ApplicationDbContext applicationDbContext,
+            UserManager<ApplicationUser> userManager
+        )
         {
             var dbWasInitialized = applicationDbContext.Roles.Any();
             if (dbWasInitialized)
@@ -27,31 +30,37 @@ namespace UserMonitoringAndHistory.Data
             {
                 Id = UserRoleType.Standard.ToString(),
                 Name = UserRoleType.Standard.ToString(),
-                ConcurrencyStamp = DateTime.UtcNow.ToLongDateString()
+                ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()
             });
             applicationDbContext.Roles.Add(new IdentityRole
             {
                 Id = UserRoleType.Admin.ToString(),
                 Name = UserRoleType.Admin.ToString(),
-                ConcurrencyStamp = DateTime.UtcNow.ToLongDateString()
+                ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()
             });
 
-            applicationDbContext.Users.Add(new ApplicationUser
+            var adminUser = new ApplicationUser
             {
                 Id = TestData.AdminUserId.ToString(),
                 UserName = TestData.AdminUserName,
                 Email = TestData.AdminUserEmail,
-                PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null, TestData.AdminUserPassword),
-                ConcurrencyStamp = DateTime.UtcNow.ToLongDateString()
-            });
+                ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString(),
+                EmailConfirmed = true,
+            };
 
-            applicationDbContext.UserRoles.Add(new IdentityUserRole<string>
+            var result = userManager.CreateAsync(adminUser, TestData.AdminUserPassword).GetAwaiter().GetResult();
+
+            if (result.Succeeded)
             {
-                RoleId = UserRoleType.Admin.ToString(),
-                UserId = TestData.AdminUserId.ToString()
-            });
+                applicationDbContext.SaveChanges();
 
-            applicationDbContext.SaveChanges();
+                applicationDbContext.UserRoles.Add(new IdentityUserRole<string>
+                {
+                    RoleId = UserRoleType.Admin.ToString(),
+                    UserId = TestData.AdminUserId.ToString()
+                });
+                applicationDbContext.SaveChanges();
+            }
         }
     }
 }
