@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { AuthorizeService, AuthenticationResultStatus } from '../authorize.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { LoginActions, QueryParameterNames, ApplicationPaths, ReturnUrlType } from '../api-authorization.constants';
 
 // The main responsibility of this component is to handle the user's login process.
@@ -19,9 +20,12 @@ export class LoginComponent implements OnInit {
   constructor(
     private authorizeService: AuthorizeService,
     private activatedRoute: ActivatedRoute,
-    private router: Router) { }
+    private router: Router,
+    private http: HttpClient, 
+    @Inject('BASE_URL') private baseUrl: string) { }
 
   async ngOnInit() {
+    alert("ngInit");
     const action = this.activatedRoute.snapshot.url[1];
     switch (action.path) {
       case LoginActions.Login:
@@ -54,6 +58,7 @@ export class LoginComponent implements OnInit {
       case AuthenticationResultStatus.Redirect:
         break;
       case AuthenticationResultStatus.Success:
+        alert("login success");
         await this.navigateToReturnUrl(returnUrl);
         break;
       case AuthenticationResultStatus.Fail:
@@ -74,12 +79,20 @@ export class LoginComponent implements OnInit {
         // There should not be any redirects as completeSignIn never redirects.
         throw new Error('Should not redirect.');
       case AuthenticationResultStatus.Success:
+        alert("login Callback");
         await this.navigateToReturnUrl(this.getReturnUrl(result.state));
         break;
       case AuthenticationResultStatus.Fail:
         this.message.next(result.message);
         break;
     }
+  }
+
+  private callLoginCallbackOnBackend(): void {
+    this.http.post(this.baseUrl + 'currentuser/login-callback', null)
+    .subscribe(result => {
+      console.info("called a call back");
+    }, error => console.error(error));
   }
 
   private redirectToRegister(): any {
@@ -92,6 +105,7 @@ export class LoginComponent implements OnInit {
   }
 
   private async navigateToReturnUrl(returnUrl: string) {
+    alert("return url");
     // It's important that we do a replace here so that we remove the callback uri with the
     // fragment containing the tokens from the browser history.
     await this.router.navigateByUrl(returnUrl, {
