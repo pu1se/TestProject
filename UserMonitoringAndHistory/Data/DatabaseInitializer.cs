@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using Microsoft.EntityFrameworkCore;
 using UserMonitoringAndHistory.Data.Enums;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace UserMonitoringAndHistory.Data
 {
@@ -16,10 +17,8 @@ namespace UserMonitoringAndHistory.Data
 
     public static class DatabaseInitializer
     {
-        public static void Seed(
-            ApplicationDbContext dbContext,
-            UserManager<ApplicationUser> userManager
-        )
+        public static void Seed(ApplicationDbContext dbContext,
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             dbContext.Database.Migrate();
 
@@ -29,16 +28,11 @@ namespace UserMonitoringAndHistory.Data
                 return;
             }
 
-            dbContext.Roles.Add(new IdentityRole
-            {
-                Id = UserRoleType.Admin.ToString(),
-                Name = UserRoleType.Admin.ToString(),
-                ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()
-            });
+            roleManager.CreateAsync(new IdentityRole(UserRoleType.Admin.ToString())).Wait();
 
             var adminUser = new ApplicationUser
             {
-                Id = TestData.AdminUserId.ToString(),
+                Id = TestData.AdminUserId,
                 UserName = TestData.AdminUserName,
                 Email = TestData.AdminUserEmail,
                 ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString(),
@@ -49,14 +43,7 @@ namespace UserMonitoringAndHistory.Data
 
             if (result.Succeeded)
             {
-                dbContext.SaveChanges();
-
-                dbContext.UserRoles.Add(new IdentityUserRole<string>
-                {
-                    RoleId = UserRoleType.Admin.ToString(),
-                    UserId = TestData.AdminUserId
-                });
-                dbContext.SaveChanges();
+                userManager.AddToRoleAsync(adminUser, UserRoleType.Admin.ToString()).Wait();
             }
         }
     }
