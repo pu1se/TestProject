@@ -11,7 +11,7 @@ namespace UserMonitoringAndHistory.Data
         public static readonly string AdminUserEmail = "admin@admin.com";
         public static readonly string AdminUserName = "admin@admin.com";
         public static readonly string AdminUserPassword = "admin@admin.com";
-        public static readonly Guid AdminUserId = new Guid("1118aa58-c48e-4696-98cf-1b6e22c63076");
+        public static readonly string AdminUserId = "1118aa58-c48e-4696-98cf-1b6e22c63076";
     }
 
     public static class DatabaseInitializer
@@ -60,7 +60,7 @@ namespace UserMonitoringAndHistory.Data
                 dbContext.UserRoles.Add(new IdentityUserRole<string>
                 {
                     RoleId = UserRoleType.Admin.ToString(),
-                    UserId = TestData.AdminUserId.ToString()
+                    UserId = TestData.AdminUserId
                 });
                 dbContext.SaveChanges();
             }
