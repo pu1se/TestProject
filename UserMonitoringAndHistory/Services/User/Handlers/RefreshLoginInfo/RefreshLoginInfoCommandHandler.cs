@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using UserMonitoringAndHistory.Data;
 
 namespace UserMonitoringAndHistory.Services.User.Handlers.RefreshLoginInfo
@@ -12,10 +13,10 @@ namespace UserMonitoringAndHistory.Services.User.Handlers.RefreshLoginInfo
 
         protected override async Task<CallResult> HandleCommandAsync(RefreshLoginInfoCommand command)
         {
-            var user = await DB.Users.FindAsync(command.UserId);
+            var user = await DB.Users.FirstOrDefaultAsync(el => el.Email == command.UserEmail);
             if (user == null)
             {
-                return NotFoundResult($"User with id {command.UserId} was not found.");
+                return NotFoundResult($"User with id {command.UserEmail} was not found.");
             }
 
             user.LastLoginDateUtc = DateTime.UtcNow;

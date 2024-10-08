@@ -10,12 +10,12 @@ namespace UserMonitoringAndHistory.Services.User
         {
         }
 
-        public Task<CallResult> RefreshLoginInfo(string userId)
+        public Task<CallResult> RefreshLoginInfo(string userEmail)
         {
             var handler = GetHandler<RefreshLoginInfoCommandHandler>();
             return handler.HandleAsync(new RefreshLoginInfoCommand
             {
-                UserId = userId
+                UserEmail = userEmail
             });
         }
     }

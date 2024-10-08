@@ -18,15 +18,15 @@ namespace Tests.UserMonitoringAndHistory
         public async Task If_call_RefreshLoginInfoCommandHandler___Then_User_login_info_will_be_updated()
         {
             // init.
-            var userId = TestData.AdminUserId;
-            var user = await DB.Users.FirstAsync(el => el.Id == userId);
+            var userEmail = TestData.AdminUserEmail;
+            var user = await DB.Users.FirstOrDefaultAsync(el => el.Email == userEmail);
             var oldCountLoginNumber = user.CountLoginNumber;
             var oldLastLoginDate = user.LastLoginDateUtc;
 
 
             // act.
-            var callResult = await Service.RefreshLoginInfo(userId);
-            var userAfterLoginInfoRefresh = await DB.Users.FirstAsync(el => el.Id == userId);
+            var callResult = await Service.RefreshLoginInfo(userEmail);
+            var userAfterLoginInfoRefresh = await DB.Users.FirstOrDefaultAsync(el => el.Email == userEmail);
 
 
             // check.
