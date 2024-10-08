@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace UserMonitoringAndHistory
+﻿namespace UserMonitoringAndHistory.Data.Enums
 {
     public enum UserRoleType
     {

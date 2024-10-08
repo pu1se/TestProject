@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System;
-using UserMonitoringAndHistory.Models;
+using Microsoft.EntityFrameworkCore;
+using UserMonitoringAndHistory.Data.Enums;
 
 namespace UserMonitoringAndHistory.Data
 {
@@ -15,24 +16,26 @@ namespace UserMonitoringAndHistory.Data
 
     public static class DatabaseInitializer
     {
-        public static void BaseSeeding(
-            ApplicationDbContext applicationDbContext,
+        public static void Seed(
+            ApplicationDbContext dbContext,
             UserManager<ApplicationUser> userManager
         )
         {
-            var dbWasInitialized = applicationDbContext.Roles.Any();
+            dbContext.Database.Migrate();
+
+            var dbWasInitialized = dbContext.Roles.Any();
             if (dbWasInitialized)
             {
                 return;
             }
 
-            applicationDbContext.Roles.Add(new IdentityRole
+            dbContext.Roles.Add(new IdentityRole
             {
                 Id = UserRoleType.Standard.ToString(),
                 Name = UserRoleType.Standard.ToString(),
                 ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()
             });
-            applicationDbContext.Roles.Add(new IdentityRole
+            dbContext.Roles.Add(new IdentityRole
             {
                 Id = UserRoleType.Admin.ToString(),
                 Name = UserRoleType.Admin.ToString(),
@@ -52,14 +55,14 @@ namespace UserMonitoringAndHistory.Data
 
             if (result.Succeeded)
             {
-                applicationDbContext.SaveChanges();
+                dbContext.SaveChanges();
 
-                applicationDbContext.UserRoles.Add(new IdentityUserRole<string>
+                dbContext.UserRoles.Add(new IdentityUserRole<string>
                 {
                     RoleId = UserRoleType.Admin.ToString(),
                     UserId = TestData.AdminUserId.ToString()
                 });
-                applicationDbContext.SaveChanges();
+                dbContext.SaveChanges();
             }
         }
     }
