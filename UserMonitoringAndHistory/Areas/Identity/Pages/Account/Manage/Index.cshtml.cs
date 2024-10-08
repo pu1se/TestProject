@@ -105,7 +105,8 @@ namespace UserMonitoringAndHistory.Areas.Identity.Pages.Account.Manage
                 var maxFileSize = 20 * 1024; // 20 KB
                 if (file.Length > maxFileSize)
                 {
-                    return BadRequest("Image size is too big, it shouldn't be more than 20 KB.");
+                    StatusMessage = "Error: image size is too big, it shouldn't be more than 20 KB.";
+                    return RedirectToPage();
                 }
 
                 using (var dataStream = new MemoryStream())
