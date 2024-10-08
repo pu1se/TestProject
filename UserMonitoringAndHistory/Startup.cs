@@ -30,7 +30,7 @@ namespace UserMonitoringAndHistory
             DependencyManager.RegisterDependencies(services, Configuration);
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(
+            services.AddDefaultIdentity<ApplicationUser>(
                     options =>
                     {
                         options.SignIn.RequireConfirmedAccount = false;
@@ -57,8 +57,7 @@ namespace UserMonitoringAndHistory
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                    DatabaseInitializer.Seed(dbContext, userManager, roleManager);
+                    DatabaseInitializer.Seed(dbContext, userManager);
                 }
             }
             catch
