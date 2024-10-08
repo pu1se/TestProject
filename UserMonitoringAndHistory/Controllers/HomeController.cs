@@ -7,22 +7,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using UserMonitoringAndHistory.Models;
+using UserMonitoringAndHistory.Services.User;
+using System.Security.Claims;
 
 namespace UserMonitoringAndHistory.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly UserService _userService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(UserService userService)
         {
-            _logger = logger;
+            _userService = userService;
         }
 
-        public IActionResult Index()
+        private string GetCurrentUserId()
         {
-            return View();
+            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var getUserListResult = await _userService.GetUserList();
+            return View(getUserListResult);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetAsAdmin(string userId)
+        {
+            var getUserListResult = await _userService.GetUserList();
+            return View("Index", getUserListResult);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var getUserListResult = await _userService.GetUserList();
+            return View("Index", getUserListResult);
         }
 
         public IActionResult Privacy()

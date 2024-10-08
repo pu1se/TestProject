@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserMonitoringAndHistory.Data;
+using UserMonitoringAndHistory.Data.Enums;
 
 namespace UserMonitoringAndHistory.Services.User.Handlers.GetUserList
 {
@@ -19,8 +20,18 @@ namespace UserMonitoringAndHistory.Services.User.Handlers.GetUserList
                 UserId = el.Id,
                 Name = el.UserName,
                 Email = el.Email,
+                ProfileImage = el.ProfileImage,
+                LastLoginDateUtc = el.LastLoginDateUtc,
+                CountLoginNumber = el.CountLoginNumber,
             })
             .ToListAsync();
+
+            var userRoles = await DB.UserRoles.ToListAsync();
+
+            foreach (var user in users)
+            {
+                user.IsAdmin = userRoles.Any(x => x.UserId == user.UserId && x.RoleId == UserRoleType.Admin.ToString());
+            }
 
             return SuccessListResult(users);
         }

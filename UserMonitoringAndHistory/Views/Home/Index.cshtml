@@ -1,8 +1,59 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@model CallListResult<UserMonitoringAndHistory.Services.User.Handlers.GetUserList.GetUserListItemResult>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (Model.IsSuccess)
+{
+    <table class="table text-center">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Avatar</th>
+            <th>Login Number</th>
+            <th>Last Login Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model.Data)
+        {
+            <tr>
+                <td>@user.Name</td>
+                <td style="text-align: center">@(user.IsAdmin ? "Admin" : "-")</td>
+                <td>
+                    @if(user.ProfileImage != null)
+                    {
+                        <img src="data:image/*;base64,@(Convert.ToBase64String(user.ProfileImage))" style="width: 50px; height: 50px;"/>
+                    }
+                </td>
+                <td>@user.CountLoginNumber</td>
+                <td>@user.LastLoginDateUtc?.ToString("yy-MM-dd HH:mm")</td>
+                <td>
+                    @if (user.IsAdmin)
+                    {
+                        <form asp-action="SetAsAdmin" method="post">
+                            <input type="hidden" name="userId" value="@user.UserId" />
+                            <button type="submit">Set as Admin</button>
+                        </form>
+                    }
+
+                    @if (user.IsAdmin && user.UserId != null)
+                    {
+                        <form asp-action="DeleteUser" method="post">
+                            <input type="hidden" name="userId" value="@user.UserId" />
+                            <button type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <span style="color: darkred">@Model.ErrorMessage</span>
+}
+

@@ -60,9 +60,9 @@ namespace UserMonitoringAndHistory
                     DatabaseInitializer.Seed(dbContext, userManager);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Console.WriteLine(ex.Message);
             }
 
             if (env.IsDevelopment())

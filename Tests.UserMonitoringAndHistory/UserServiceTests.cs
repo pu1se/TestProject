@@ -43,5 +43,22 @@ namespace Tests.UserMonitoringAndHistory
                 Assert.IsTrue(newLastLoginDate!.Value < DateTime.UtcNow);
             }
         }
+
+        [TestMethod]
+        public async Task If_call_GetUserListQueryHandler___Then_return_list_of_users()
+        {
+            // act.
+            var callResult = await Service.GetUserList();
+
+            // check.
+            Assert.IsTrue(callResult != null);
+            Assert.IsTrue(callResult.IsSuccess);
+
+            var adminUser = callResult.Data.First(x => x.UserId == TestData.AdminUserId);
+            Assert.IsTrue(adminUser != null);
+            Assert.IsTrue(adminUser.Name == TestData.AdminUserName);
+            Assert.IsTrue(adminUser.Email == TestData.AdminUserEmail);
+            Assert.IsTrue(adminUser.IsAdmin);
+        }
     }
 }
