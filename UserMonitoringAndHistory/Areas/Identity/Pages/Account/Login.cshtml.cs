@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using UserMonitoringAndHistory.Data;
 using UserMonitoringAndHistory.Services.User;
+using UserMonitoringAndHistory.Services.User.Handlers.RefreshLoginInfo;
 
 namespace UserMonitoringAndHistory.Areas.Identity.Pages.Account
 {
@@ -89,7 +90,7 @@ namespace UserMonitoringAndHistory.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    await _userService.RefreshLoginInfo(Input.Email);
+                    await _userService.RefreshLoginInfo(new RefreshLoginInfoCommand{ UserEmail = Input.Email });
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

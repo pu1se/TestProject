@@ -4,10 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UserMonitoringAndHistory;
 using UserMonitoringAndHistory.Data;
 using UserMonitoringAndHistory.Services.User;
+using UserMonitoringAndHistory.Services.User.Handlers.DeleteUser;
+using UserMonitoringAndHistory.Services.User.Handlers.GetUserList;
+using UserMonitoringAndHistory.Services.User.Handlers.RefreshLoginInfo;
 
 namespace Tests.UserMonitoringAndHistory
 {
@@ -25,7 +30,7 @@ namespace Tests.UserMonitoringAndHistory
 
 
             // act.
-            var callResult = await Service.RefreshLoginInfo(userEmail);
+            var callResult = await Service.RefreshLoginInfo(new RefreshLoginInfoCommand{ UserEmail = userEmail });
             var userAfterLoginInfoRefresh = await DB.Users.FirstOrDefaultAsync(el => el.Email == userEmail);
 
 
@@ -48,7 +53,10 @@ namespace Tests.UserMonitoringAndHistory
         public async Task If_call_GetUserListQueryHandler___Then_return_list_of_users()
         {
             // act.
-            var callResult = await Service.GetUserList();
+            var callResult = await Service.GetUserList(new GetUserListQuery
+            {
+                OnBehalfOfUserId = TestData.AdminUserId
+            });
 
             // check.
             Assert.IsTrue(callResult != null);
@@ -59,6 +67,7 @@ namespace Tests.UserMonitoringAndHistory
             Assert.IsTrue(adminUser.Name == TestData.AdminUserName);
             Assert.IsTrue(adminUser.Email == TestData.AdminUserEmail);
             Assert.IsTrue(adminUser.IsAdmin);
+            Assert.IsTrue(adminUser.ThisIsCurrentUser);
         }
     }
 }

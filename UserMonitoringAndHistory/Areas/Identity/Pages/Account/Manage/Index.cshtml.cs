@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -76,6 +77,12 @@ namespace UserMonitoringAndHistory.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (user.Id != currentUserId)
+            {
+                return BadRequest("You can update only your current user.");
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
@@ -95,6 +102,12 @@ namespace UserMonitoringAndHistory.Areas.Identity.Pages.Account.Manage
             if (Request.Form.Files.Count > 0)
             {
                 var file = Request.Form.Files.FirstOrDefault();
+                var maxFileSize = 20 * 1024; // 20 KB
+                if (file.Length > maxFileSize)
+                {
+                    return BadRequest("Image size is too big, it shouldn't be more than 20 KB.");
+                }
+
                 using (var dataStream = new MemoryStream())
                 {
                     await file.CopyToAsync(dataStream);

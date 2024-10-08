@@ -7,14 +7,17 @@ using UserMonitoringAndHistory.Data.Enums;
 
 namespace UserMonitoringAndHistory.Services.User.Handlers.GetUserList
 {
-    public class GetUserListQueryHandler : QueryHandler<EmptyQuery, CallListResult<GetUserListItemResult>>
+    public class GetUserListQueryHandler : QueryHandler<GetUserListQuery, CallListResult<GetUserListItemResult>>
     {
         public GetUserListQueryHandler(ApplicationDbContext db) : base(db)
         {
         }
 
-        protected override async Task<CallListResult<GetUserListItemResult>> HandleQueryAsync(EmptyQuery query)
+        protected override async Task<CallListResult<GetUserListItemResult>> HandleQueryAsync(GetUserListQuery query)
         {
+            var userRoles = await DB.UserRoles.ToListAsync();
+            var IsCurrentUserInRoleAdmin = userRoles.Any(x => x.UserId == query.OnBehalfOfUserId && x.RoleId == UserRoleType.Admin.ToString());
+
             var users = await DB.Users.Select(el => new GetUserListItemResult
             {
                 UserId = el.Id,
@@ -23,10 +26,12 @@ namespace UserMonitoringAndHistory.Services.User.Handlers.GetUserList
                 ProfileImage = el.ProfileImage,
                 LastLoginDateUtc = el.LastLoginDateUtc,
                 CountLoginNumber = el.CountLoginNumber,
+                ThisIsCurrentUser = query.OnBehalfOfUserId == el.Id,
+                IsCurrentUserInRoleAdmin = IsCurrentUserInRoleAdmin
             })
             .ToListAsync();
 
-            var userRoles = await DB.UserRoles.ToListAsync();
+            
 
             foreach (var user in users)
             {

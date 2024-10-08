@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Authorization;
 using UserMonitoringAndHistory.Models;
 using UserMonitoringAndHistory.Services.User;
 using System.Security.Claims;
+using UserMonitoringAndHistory.Services.User.Handlers.DeleteUser;
+using UserMonitoringAndHistory.Services.User.Handlers.GetUserList;
+using UserMonitoringAndHistory.Services.User.Handlers.SetToUserAdminRole;
 
 namespace UserMonitoringAndHistory.Controllers
 {
-    [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly UserService _userService;
 
@@ -22,28 +24,53 @@ namespace UserMonitoringAndHistory.Controllers
             _userService = userService;
         }
 
-        private string GetCurrentUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
-
         public async Task<IActionResult> Index()
         {
-            var getUserListResult = await _userService.GetUserList();
+            var getUserListResult = await _userService.GetUserList(new GetUserListQuery
+            {
+                OnBehalfOfUserId = GetCurrentUserId()
+            });
             return View(getUserListResult);
         }
 
         [HttpPost]
         public async Task<IActionResult> SetAsAdmin(string userId)
         {
-            var getUserListResult = await _userService.GetUserList();
+            var setAdminResult = await _userService.SetToUserAdminRole(new SetToUserAdminRoleCommand
+            {
+                UserId = userId,
+            });
+
+            if (setAdminResult.IsFail)
+            {
+                return View("Index", new CallListResult<GetUserListItemResult>(setAdminResult.ErrorMessage, setAdminResult.ErrorType));
+            }
+
+            var getUserListResult = await _userService.GetUserList(new GetUserListQuery
+            {
+                OnBehalfOfUserId = GetCurrentUserId()
+            });
             return View("Index", getUserListResult);
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            var getUserListResult = await _userService.GetUserList();
+            var deleteResult = await _userService.DeleteUser(new DeleteUserCommand
+            {
+                UserId = userId,
+                OnBehalfOfUserId = GetCurrentUserId()
+            });
+
+            if (deleteResult.IsFail)
+            {
+                return View("Index", new CallListResult<GetUserListItemResult>(deleteResult.ErrorMessage, deleteResult.ErrorType));
+            }
+
+            var getUserListResult = await _userService.GetUserList(new GetUserListQuery
+            {
+                OnBehalfOfUserId = GetCurrentUserId()
+            });
             return View("Index", getUserListResult);
         }
 

@@ -8,7 +8,7 @@ namespace UserMonitoringAndHistory
 {
     public abstract class QueryHandler<TQuery, TResult> : CallResultShortcuts, IHandler 
         where TResult : CallResult, new() 
-        where TQuery : EmptyQuery
+        where TQuery : Query
     {
         protected ApplicationDbContext DB { get; }
 

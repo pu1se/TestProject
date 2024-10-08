@@ -11,5 +11,7 @@ namespace UserMonitoringAndHistory.Services.User.Handlers.GetUserList
         public byte[] ProfileImage { get; set; }
         public DateTime? LastLoginDateUtc { get; set; }
         public int CountLoginNumber { get; set; }
+        public bool ThisIsCurrentUser { get; set; }
+        public bool IsCurrentUserInRoleAdmin { get; set; }
     }
 }
