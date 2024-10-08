@@ -8,7 +8,7 @@ namespace UserMonitoringAndHistory
 {
     public abstract class QueryHandler<TQuery, TResult> : CallResultShortcuts, IHandler 
         where TResult : CallResult, new() 
-        where TQuery : Query
+        where TQuery : EmptyQuery
     {
         protected ApplicationDbContext DB { get; }
 
@@ -17,7 +17,7 @@ namespace UserMonitoringAndHistory
             DB = db;
         }
 
-        protected abstract Task<TResult> HandleCommandAsync(TQuery query);
+        protected abstract Task<TResult> HandleQueryAsync(TQuery query);
 
         private TResult ValidateModel(TQuery query)
         {
@@ -40,7 +40,7 @@ namespace UserMonitoringAndHistory
                 return validationResult;
             }
 
-            return await HandleCommandAsync(query);
+            return await HandleQueryAsync(query);
         }
     }
 }

@@ -31,12 +31,6 @@ namespace UserMonitoringAndHistory.Data
 
             dbContext.Roles.Add(new IdentityRole
             {
-                Id = UserRoleType.Standard.ToString(),
-                Name = UserRoleType.Standard.ToString(),
-                ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()
-            });
-            dbContext.Roles.Add(new IdentityRole
-            {
                 Id = UserRoleType.Admin.ToString(),
                 Name = UserRoleType.Admin.ToString(),
                 ConcurrencyStamp = DateTime.UtcNow.ToLongTimeString()

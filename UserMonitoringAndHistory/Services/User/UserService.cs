@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using UserMonitoringAndHistory.Services.User.Handlers.DeleteUser;
+using UserMonitoringAndHistory.Services.User.Handlers.GetUserList;
 using UserMonitoringAndHistory.Services.User.Handlers.RefreshLoginInfo;
 
 namespace UserMonitoringAndHistory.Services.User
@@ -17,6 +19,22 @@ namespace UserMonitoringAndHistory.Services.User
             {
                 UserEmail = userEmail
             });
+        }
+
+        public Task<CallListResult<GetUserListItemResult>> GetUserList()
+        {
+            var handler = GetHandler<GetUserListQueryHandler>();
+            return handler.HandleAsync(EmptyQuery.Value);
+        }
+
+        public Task<CallResult> DeleteUser(string userId)
+        {
+            var handler = GetHandler<DeleteUserCommandHandler>();
+            return handler.HandleAsync(
+                new DeleteUserCommand
+                {
+                    UserId = userId
+                });
         }
     }
 }
